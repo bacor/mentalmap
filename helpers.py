@@ -21,16 +21,46 @@ def read_map(map_fn):
 	M = np.concatenate((M, np.zeros((1,M.shape[1]))), axis=0)
 	return M
 
-def generate_path(init, length, Map, next_step):
+def generate_path(init, length, Map):
 	"""Get a random walk through the map given an initial position,
-	a length and a function that returns the next step"""
-	path = [init]
+	a length and the actual map. The path can never go back, so 
+	can only go forward, right or left.
+
+	Arguments: 
+	init: a pair (x, y) of initial coordinates
+	length: the maximum length of the path
+	Map: the map matrix
+
+	Returns:
+	path: a list of (x,y) coordinates
+	"""
+
+	# Check if the initial position is valid (i.e. not on a boundary)
 	x, y = init
 	if Map[x,y] == 0:
 		print("Error: invalid initial position")
 		raise
 
-	for i in range(length -1):
-		x, y = next_step(x, y, Map)
-		path.append((x,y))
-	return path
+	xs, ys = [x], [y]
+	for i in range(length - 1):
+
+		# Find all possible next positions 
+		candidates = []
+		for d in np.array([[-1,0], [1,0], [0,-1], [0,1]]):
+			cand_x, cand_y = (x, y) + d
+
+			# Don't walk across boundaries and never go back
+			if (Map[cand_x, cand_y] != 0
+				and not (len(xs) > 1 and ((xs[-2], ys[-2]) == (cand_x, cand_y)))):
+				candidates.append((cand_x, cand_y))
+
+		# Stop if there are no futher options
+		if len(candidates) == 0: break
+
+		# And otherwise, randomly pick a next position
+		index = np.random.randint(len(candidates))
+		x, y = candidates[index]
+		xs.append(x)
+		ys.append(y)
+
+	return list(zip(xs, ys))
