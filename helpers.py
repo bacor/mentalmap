@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def show_map(map_matrix):
 	"""Just plot the map matrix"""
-	plt.imshow(map_matrix, cmap="gray", origin='upper', interpolation='none')
+	plt.imshow(map_matrix.T, cmap="gray", origin='upper', interpolation='none')
 
 def read_map(map_fn):
 	"""Read out the map from a CSV file exported from google docs"""
